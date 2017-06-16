@@ -20,6 +20,10 @@ namespace MEFHost
         public IExportProviderFactory ExportProviderFactory { get; private set; }
         public ExportProvider ExportProvider { get; private set; }
 
+        /// <summary>
+        /// IMPORTANT: to run this, set the working directory of the app to C:\monodevelop\main\build
+        /// or wherever your MonoDevelop instance is. Otherwise it won't find the binaries.
+        /// </summary>
         static void Main(string[] args)
         {
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
