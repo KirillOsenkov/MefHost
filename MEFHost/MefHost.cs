@@ -30,7 +30,9 @@ namespace MEFHost
                 Environment.CurrentDirectory = Path.GetFullPath(args[0]);
             }
 
+            var sw = Stopwatch.StartNew();
             new Program().InitializeInstanceAsync().Wait();
+            Console.WriteLine(sw.Elapsed.ToString("s\\.fff"));
         }
 
         static readonly string EntryPoint = Process.GetCurrentProcess().MainModule.FileName;
@@ -86,15 +88,23 @@ namespace MEFHost
             var tasks = new List<Task<DiscoveredParts>>(assemblies.Count);
             foreach (var assembly in assemblies)
             {
-                var task = Discovery.CreatePartsAsync(assembly);
+                var task = Task.Run (() => Discovery.CreatePartsAsync(assembly));
+                // var task = Discovery.CreatePartsAsync(assembly);
                 tasks.Add(task);
             }
 
-            await Task.WhenAll(tasks);
+            //await Task.WhenAll(tasks);
+
+            //while (tasks.Count > 0)
+            //{
+            //    var task = await Task.WhenAny(tasks);
+            //    catalog = catalog.AddParts(task.Result);
+            //    tasks.Remove(task);
+            //}
 
             foreach (var task in tasks)
             {
-                catalog = catalog.AddParts(task.Result);
+                catalog = catalog.AddParts(await task);
             }
 
             var discoveryErrors = catalog.DiscoveredParts.DiscoveryErrors;
